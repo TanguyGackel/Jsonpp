@@ -51,16 +51,14 @@ void json::handle_member(serializable *object) {
         case token_type::null:
             break;
         case token_type::beginobject:{
-//            auto obj_variable = map_attributes.find(name);
-//
-//            std::map<std::string, void(*)(serializable**)> &map_constructors = object->get_constructors();
-//            auto constructor = map_constructors.find(name);
-//
-//            if (obj_variable != map_attributes.end()) {
-////                create_obj<serializable>((serializable**)obj_variable->second);
-//                if(constructor != map_constructors.end())
-//                    create_obj((serializable**)obj_variable->second, constructor->second);
-//            }
+            auto obj_variable = map_attributes.find(name);
+
+            std::map<std::string, void(*)(serializable**)> &map_constructors = object->get_constructors();
+            auto constructor = map_constructors.find(name);
+
+            if (obj_variable != map_attributes.end())
+                if(constructor != map_constructors.end())
+                    create_obj((serializable**)obj_variable->second, constructor->second);
             break;
         }
         case token_type::beginarray:
@@ -90,10 +88,10 @@ void json::create_array() {
 
 }
 
-//void json::create_obj(serializable** object ,void(*func)(serializable**)){
-//    (func)(object);
-//    handle_member(*object);
-//}
+void json::create_obj(serializable** object ,void(*func)(serializable**)){
+    (func)(object);
+    handle_member(*object);
+}
 
 void json::deserializer(const std::string &json, double &object){
     lexer lex(json);

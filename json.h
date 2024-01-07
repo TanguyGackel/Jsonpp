@@ -20,7 +20,7 @@ private:
     void receive_token(token&);
     template <typename T>
     void create_obj(serializable**);
-//    void create_obj(serializable** object ,void(*)(serializable**));
+    void create_obj(serializable** object ,void(*)(serializable**));
     void create_array();
     void handle_member(serializable*);
 
