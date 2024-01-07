@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include "json.h"
-#include "classTest.h"
 
 void json::handle_member(serializable *object) {
     token tok;
