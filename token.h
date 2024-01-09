@@ -21,6 +21,7 @@ enum class token_type {
     string,
     boolean,
     null,
+    insignificant
 };
 
 struct token final {

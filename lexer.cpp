@@ -1,3 +1,4 @@
+#include <iostream>
 #include "lexer.h"
 
 lexer::lexer(std::string_view input)
@@ -173,6 +174,7 @@ void lexer::next_token(token &t) noexcept
         case 0x09:
         case 0x0A:
         case 0x0D:
+            t.type = token_type::insignificant;
             break;
         default:
             if(this->byte == '-' || std::isdigit(this->byte))
@@ -188,9 +190,12 @@ void lexer::next_token(token &t) noexcept
 }
 
 void lexer::read_input(std::queue<token>& queueToken){
-    for(int i = 0; i < this->input.size(); i++){
+    std::cout << this->input.size() << std::endl;
+
+    while(this->position < this->input.size()){
         token tok;
         this->next_token(tok);
-        queueToken.push(tok);
+        if(tok.type != token_type::insignificant)
+            queueToken.push(tok);
     }
 }
