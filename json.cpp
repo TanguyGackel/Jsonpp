@@ -23,11 +23,19 @@ void json::handle_member(serializable *object) {
 
     receive_token(tok);
     switch (tok.type) {
-        case token_type::number:{
+        case token_type::numberdouble:{
             double value = std::stod(get<std::string>(tok.literal));
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
                 *(double*)obj_variable->second = value;
+            }
+            break;
+        }
+        case token_type::numberlong:{
+            long long value = std::stoll(get<std::string>(tok.literal));
+            auto obj_variable = map_attributes.find(name);
+            if (obj_variable != map_attributes.end()) {
+                *(long long*)obj_variable->second = value;
             }
             break;
         }
@@ -61,6 +69,7 @@ void json::handle_member(serializable *object) {
             break;
         }
         case token_type::beginarray:
+
             break;
         default:
             throw;

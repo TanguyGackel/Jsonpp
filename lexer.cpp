@@ -63,13 +63,17 @@ void lexer::read_number(token &t) noexcept {
         current += this->byte;
         if(!std::isdigit(this->byte)){
             if(this->byte == '.' && !hasDecimal){
+                if(hasExp){
+                    t.literal = current;
+                    t.type = token_type::illegal;
+                }
                 hasDecimal = true;
             }
             else if((this->byte == 'e' || this->byte == 'E') && !hasExp){
                 hasExp = true;
                 next_char();
                 current += this->byte;
-                if(this->byte != '+' && this->byte != '-' && std::isdigit(this->byte)){
+                if(this->byte != '+' && this->byte != '-' && !std::isdigit(this->byte)){
                     t.literal = current;
                     t.type = token_type::illegal;
                 }
@@ -84,8 +88,14 @@ void lexer::read_number(token &t) noexcept {
 
     this->read_position--;
 
+    if(t.type == token_type::illegal)
+        return;
+
     t.literal = current;
-    t.type = token_type::number;
+    if(hasDecimal)
+        t.type = token_type::numberdouble;
+    else
+        t.type = token_type::numberlong;
 }
 
 void lexer::read_boolean(token &t) noexcept {
@@ -190,8 +200,6 @@ void lexer::next_token(token &t) noexcept
 }
 
 void lexer::read_input(std::queue<token>& queueToken){
-    std::cout << this->input.size() << std::endl;
-
     while(this->position < this->input.size()){
         token tok;
         this->next_token(tok);
