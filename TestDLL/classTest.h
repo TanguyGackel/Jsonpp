@@ -12,6 +12,7 @@
 class classTest: public serializable{
 public:
     double Width;
+    long long Height;
     std::string Url;
     bool Animated;
     classTest* cT;

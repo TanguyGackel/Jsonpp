@@ -13,9 +13,10 @@ class lexer {
 
 private:
     std::string_view input;
-    size_t position;  // Point to the current byte
-    size_t read_position;  // Peeks at the next byte
+    size_t position;
+    size_t read_position;
     char byte;
+    bool checkEOF(token& t) const noexcept;
     void next_char() noexcept;
     void read_string(token &) noexcept;
     void read_number(token &) noexcept;

@@ -11,13 +11,13 @@ void json::handle_member(serializable *object) {
     if(tok.type == token_type::endobject)
         return;
     if(tok.type != token_type::string)
-        throw;
+        throw std::invalid_argument("json not compliant to rfc 8259. A member must start start with a string");
 
     std::string name = get<std::string>(tok.literal);
 
     receive_token(tok);
     if(tok.type != token_type::nameseparator)
-        throw;
+        throw std::invalid_argument("json not compliant to rfc 8259. Member's name and value must be separate by a name separator");
 
     std::map<std::string, void*> &map_attributes = object->get_attributes();
 
@@ -35,7 +35,7 @@ void json::handle_member(serializable *object) {
             long long value = std::stoll(get<std::string>(tok.literal));
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
-                *(long long*)obj_variable->second = value;
+                *(long long *) obj_variable->second = value;
             }
             break;
         }
@@ -68,11 +68,14 @@ void json::handle_member(serializable *object) {
                     create_obj((serializable**)obj_variable->second, constructor->second);
             break;
         }
-        case token_type::beginarray:
+        case token_type::beginarray:{
+            auto obj_variable = map_attributes.find(name);
+            
 
-            break;
+                break;
+        }
         default:
-            throw;
+            throw std::invalid_argument("json not compliant to rfc 8259. " + get<std::string>(tok.literal) + " is not a legal value");
     }
 
     receive_token(tok);
@@ -83,13 +86,17 @@ void json::handle_member(serializable *object) {
         case token_type::endobject:
             return;
         default:
-            throw;
+            throw std::invalid_argument("json not compliant to rfc 8259. Members must be separated either by a value separator or by an end object");
     }
 }
 
-void json::receive_token(token &tok) {
-    tok = queueToken.front();
-    queueToken.pop();
+void json::receive_token(token &tok) noexcept{
+    if(!queueToken.empty()) {
+        tok = queueToken.front();
+        queueToken.pop();
+        return;
+    }
+    tok.type = token_type::eof;
 }
 
 void json::create_array() {
@@ -105,26 +112,35 @@ void json::deserializer(const std::string &json, double &object){
     lexer lex(json);
     lex.read_input(queueToken);
 
-    if(std::holds_alternative<std::string>(queueToken.front().literal))
+    if(queueToken.front().type == token_type::numberdouble)
         object = std::stod(get<std::string>(queueToken.front().literal));
     else
-        throw;
+        throw std::invalid_argument("json string must contains a unique double");
+}
+void json::deserializer(const std::string &json, long long &object){
+    lexer lex(json);
+    lex.read_input(queueToken);
+
+    if(queueToken.front().type == token_type::numberlong)
+        object = std::stoll(get<std::string>(queueToken.front().literal));
+    else
+        throw std::invalid_argument("json string must contains a unique long long");
 }
 void json::deserializer(const std::string &json, bool &object){
     lexer lex(json);
     lex.read_input(queueToken);
 
-    if(std::holds_alternative<std::string>(queueToken.front().literal))
+    if(queueToken.front().type == token_type::boolean)
         object = get<std::string>(queueToken.front().literal) == "true";
     else
-        throw;
+        throw std::invalid_argument("json string must contains a unique boolean");
 }
 void json::deserializer(const std::string &json, std::string &object){
     lexer lex(json);
     lex.read_input(queueToken);
 
-    if(std::holds_alternative<std::string>(queueToken.front().literal))
+    if(queueToken.front().type == token_type::string)
         object = get<std::string>(queueToken.front().literal);
     else
-        throw;
+        throw std::invalid_argument("json string must contains a unique string");
 }

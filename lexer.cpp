@@ -4,12 +4,20 @@
 lexer::lexer(std::string_view input)
 {
     if (input.empty()) {
-        throw std::exception();
+        throw std::invalid_argument("lexer's input can't be void");
     }
-    this->input = {input};
-    position = {0};
-    read_position = {1};
-    byte = {input[0]};
+    this->input = input;
+    position = 0;
+    read_position = 1;
+    byte = input[0];
+}
+
+bool lexer::checkEOF(token& t) const noexcept{
+    if(this->byte == '\0'){
+        t.type = token_type::illegal;
+        return true;
+    }
+    return false;
 }
 
 void lexer::next_char() noexcept
@@ -29,6 +37,11 @@ void lexer::read_string(token &t) noexcept {
     next_char();
 
     while (this->byte != '"'){
+        if(checkEOF(t)) {
+            t.literal = current;
+            return;
+        }
+
         current += this->byte;
         next_char();
     }
@@ -51,7 +64,7 @@ void lexer::read_number(token &t) noexcept {
     if(this->byte == '0'){
         next_char();
         current += this->byte;
-        if(std::isdigit(this->byte)){
+        if(std::isdigit(this->byte) || checkEOF(t)){
             t.literal = current;
             t.type = token_type::illegal;
             return;
@@ -59,7 +72,9 @@ void lexer::read_number(token &t) noexcept {
     }
     next_char();
 
-    while(this->byte != ',' && this->byte != 0x20 && this->byte != 0x09 && this->byte != 0x0A && this->byte != 0x0D && this->byte != ']' && this->byte != '}'){
+    while(this->byte != ','
+    && this->byte != 0x20 && this->byte != 0x09 && this->byte != 0x0A && this->byte != 0x0D //insignificant whitespace
+    && this->byte != ']' && this->byte != '}'){                                             //end object/array
         current += this->byte;
         if(!std::isdigit(this->byte)){
             if(this->byte == '.' && !hasDecimal){
@@ -73,23 +88,26 @@ void lexer::read_number(token &t) noexcept {
                 hasExp = true;
                 next_char();
                 current += this->byte;
-                if(this->byte != '+' && this->byte != '-' && !std::isdigit(this->byte)){
+                if((this->byte != '+' && this->byte != '-' && !std::isdigit(this->byte)) || checkEOF(t)){
                     t.literal = current;
                     t.type = token_type::illegal;
+                    return;
                 }
             }
             else{
                 t.literal = current;
                 t.type = token_type::illegal;
+                return;
             }
         }
         next_char();
+        if(checkEOF(t)){
+            t.literal = current;
+            return;
+        }
     }
 
     this->read_position--;
-
-    if(t.type == token_type::illegal)
-        return;
 
     t.literal = current;
     if(hasDecimal)
@@ -108,6 +126,11 @@ void lexer::read_boolean(token &t) noexcept {
     for(int i = 0; i < limit; i++){
         next_char();
         current += this->byte;
+
+        if(checkEOF(t)){
+            t.literal = current;
+            return;
+        }
     }
 
     t.literal = current;
@@ -128,6 +151,11 @@ void lexer::read_null(token &t) noexcept {
     for(int i = 0; i < limit; i++){
         next_char();
         current += this->byte;
+
+        if(checkEOF(t)) {
+            t.literal = current;
+            return;
+        }
     }
 
     t.literal = current;
@@ -196,6 +224,8 @@ void lexer::next_token(token &t) noexcept
             t.literal = this->byte;
     }
 
+    if(checkEOF(t))
+        return;
     this->next_char();
 }
 
