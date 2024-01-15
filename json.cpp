@@ -24,34 +24,30 @@ void json::handle_member(serializable *object) {
     receive_token(tok);
     switch (tok.type) {
         case token_type::numberdouble:{
-            double value = std::stod(get<std::string>(tok.literal));
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
-                *(double*)obj_variable->second = value;
+                *(double*)obj_variable->second = std::stod(get<std::string>(tok.literal));
             }
             break;
         }
         case token_type::numberlong:{
-            long long value = std::stoll(get<std::string>(tok.literal));
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
-                *(long long *) obj_variable->second = value;
+                *(long long *) obj_variable->second = std::stoll(get<std::string>(tok.literal));
             }
             break;
         }
         case token_type::string:{
-            std::string value = get<std::string>(tok.literal);
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
-                *(std::string*)obj_variable->second = value;
+                *(std::string*)obj_variable->second = get<std::string>(tok.literal);
             }
             break;
         }
         case token_type::boolean:{
-            bool value = get<std::string>(tok.literal) == "true";
             auto obj_variable = map_attributes.find(name);
             if (obj_variable != map_attributes.end()) {
-                *(bool*)obj_variable->second = value;
+                *(bool*)obj_variable->second = get<std::string>(tok.literal) == "true";
             }
             break;
         }
@@ -70,9 +66,10 @@ void json::handle_member(serializable *object) {
         }
         case token_type::beginarray:{
             auto obj_variable = map_attributes.find(name);
-            
 
-                break;
+
+
+            break;
         }
         default:
             throw std::invalid_argument("json not compliant to rfc 8259. " + get<std::string>(tok.literal) + " is not a legal value");
@@ -97,6 +94,7 @@ void json::receive_token(token &tok) noexcept{
         return;
     }
     tok.type = token_type::eof;
+    tok.literal = '\0';
 }
 
 void json::create_array() {
