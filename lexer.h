@@ -16,7 +16,8 @@ private:
     size_t position;
     size_t read_position;
     char byte;
-    bool checkEOF(token& t) const noexcept;
+
+    bool checkEOF(token &t) const noexcept;
     void next_char() noexcept;
     void read_string(token &) noexcept;
     void read_number(token &) noexcept;
@@ -26,7 +27,7 @@ private:
 
 public:
     explicit lexer(std::string_view input);
-    void read_input(std::queue<token>&);
+    void read_input(std::queue<token> &);
 
 };
 

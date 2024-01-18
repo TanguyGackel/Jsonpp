@@ -7,15 +7,16 @@
 
 #include <map>
 #include <string>
+
 class serializable {
 protected:
-    std::map<std::string, void*> attributes;
-    std::map<std::string, void(*)(serializable**)> constructors;
+    std::map<std::string, void *> attributes;
+    std::map<std::string, void (*)(serializable **)> constructors;
 
 public:
-    ~serializable()= default;
-    [[nodiscard]] std::map<std::string, void*>& get_attributes(){return attributes;}
-    [[nodiscard]] std::map<std::string, void(*)(serializable**)>& get_constructors(){return constructors;}
+    ~serializable() = default;
+    [[nodiscard]] std::map<std::string, void *> &get_attributes() { return attributes; }
+    [[nodiscard]] std::map<std::string, void (*)(serializable **)> &get_constructors() { return constructors; }
 };
 
 
