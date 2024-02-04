@@ -7,6 +7,8 @@
 
 #include <string_view>
 #include <queue>
+#include <stdexcept>
+
 #include "token.h"
 
 class lexer {

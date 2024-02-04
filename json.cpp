@@ -2,7 +2,6 @@
 // Created by Tanguy on 23/12/2023.
 //
 
-#include <iostream>
 #include "json.h"
 
 using variantvector = std::variant<std::vector<std::string> *, std::vector<double> *,

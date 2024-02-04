@@ -1,4 +1,3 @@
-#include <iostream>
 #include "lexer.h"
 
 lexer::lexer(std::string_view input) {

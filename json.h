@@ -6,10 +6,8 @@
 #define JSONPP_JSON_H
 
 #include <string>
-#include <queue>
 
 #include "serializable.h"
-#include "token.h"
 #include "lexer.h"
 
 class json {
