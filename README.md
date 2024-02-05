@@ -5,6 +5,6 @@ Nested array not supported for example.
 Allow serialization and deserialization.
 
 Need to check performance and to do some unit testing.
-Maybe add a namespace. Need better handling of the destructors and of memory management.
+Need better handling of the destructors and of memory management.
 
 Apart from that, works fine.
